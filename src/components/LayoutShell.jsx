@@ -17,14 +17,22 @@ export default function LayoutShell() {
   const currentPath = location.pathname;
   const [collapsed, setCollapsed] = useState(false);
 
-  const rawName = location.state?.userName || "Creator";
+  const storedName = localStorage.getItem("userName");
+  const storedId = localStorage.getItem("userId") || "user_default";
+  const rawName = location.state?.userName || storedName || "Creator";
   const dynamicName = rawName.split(" ")[0];
   const avatarInitials = dynamicName.charAt(0).toUpperCase();
 
-  // Snaps directly to the target path instantly on click with zero delays or timers
   const handleSidebarClick = (targetPath) => {
     if (currentPath === targetPath) return;
-    navigate(targetPath, { state: { userName: dynamicName } });
+    navigate(targetPath, { state: { userName: dynamicName, userId: storedId } });
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("userId");
+    localStorage.removeItem("userEmail");
+    localStorage.removeItem("userName");
+    navigate("/", { replace: true });
   };
 
   return (
@@ -36,20 +44,19 @@ export default function LayoutShell() {
         button[title="Log Out"]:hover { background: rgba(220, 38, 38, 0.08) !important; color: #dc2626 !important; }
       `}</style>
 
-      {/* Locked Structural Sidebar Frame */}
+      {/* Sidebar Frame */}
       <aside style={{ ...s.sidebar, width: collapsed ? 74 : 240 }}>
         <div style={s.sidebarTop}>
           <div style={s.logoWrap}>
             {!collapsed && (
               <>
-                {/* Look for this block in LayoutShell.jsx and change ContentForge to Viraly */}
-<div style={s.logoIcon}>
-  <svg width="20" height="20" viewBox="0 0 28 28" fill="none">
-    <path d="M4 14 L14 4 L24 14 L14 24 Z" stroke="#6b21a8" strokeWidth="2.5" fill="none" />
-    <path d="M9 14 L14 9 L19 14 L14 19 Z" fill="#ffedd5" />
-  </svg>
-</div>
-<span style={s.logoText}>Viraly</span> {/* Updated here */}
+                <div style={s.logoIcon}>
+                  <svg width="20" height="20" viewBox="0 0 28 28" fill="none">
+                    <path d="M4 14 L14 4 L24 14 L14 24 Z" stroke="#6b21a8" strokeWidth="2.5" fill="none" />
+                    <path d="M9 14 L14 9 L19 14 L14 19 Z" fill="#ffedd5" />
+                  </svg>
+                </div>
+                <span style={s.logoText}>Viraly</span>
               </>
             )}
             <button onClick={() => setCollapsed(!collapsed)} style={s.collapseBtn}>{collapsed ? "→" : "←"}</button>
@@ -68,7 +75,8 @@ export default function LayoutShell() {
             ))}
           </nav>
         </div>
-        {/* Updated User Profile Block with Logout Button Integration */}
+
+        {/* User Profile & Logout */}
         <div style={{ ...s.userWrap, justifyContent: collapsed ? "center" : "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, overflow: "hidden" }}>
             <div style={s.avatar}>{avatarInitials}</div>
@@ -82,11 +90,7 @@ export default function LayoutShell() {
           
           {!collapsed && (
             <button 
-              onClick={() => {
-                // 1. Wipe out any authentication or username tokens from storage if needed later
-                // 2. Bounce the user straight back to the login gateway
-                navigate("/", { replace: true });
-              }} 
+              onClick={handleLogout} 
               style={s.logoutBtn}
               title="Log Out"
             >
@@ -100,7 +104,7 @@ export default function LayoutShell() {
         </div>
       </aside>
 
-      {/* Main Viewport Panel Window */}
+      {/* Main Viewport */}
       <main style={s.main}>
         <header style={s.topbar}>
           <div>
@@ -116,9 +120,8 @@ export default function LayoutShell() {
           )}
         </header>
         
-        {/* The target child subpage paints right here instantly */}
         <div>
-          <Outlet context={{ dynamicName, navigateTo: handleSidebarClick }} />
+          <Outlet context={{ dynamicName, userId: storedId, navigateTo: handleSidebarClick }} />
         </div>
       </main>
     </div>

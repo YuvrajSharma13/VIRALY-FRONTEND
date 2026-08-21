@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const typeColors = { 
   YouTube: { bg: "#fef2f2", color: "#dc2626" }, 
   Blog: { bg: "#f0fdf4", color: "#16a34a" }, 
@@ -31,7 +33,7 @@ export default function History() {
   async function fetchHistory() {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:5000/api/history?userId=${encodeURIComponent(activeUserId)}`);
+      const response = await fetch(`${API_URL}/api/history?userId=${encodeURIComponent(activeUserId)}`);
       const result = await response.json();
       if (result.success) {
         setHistoryLogs(result.data || []);
@@ -110,7 +112,6 @@ export default function History() {
         )}
       </div>
 
-      {/* --- ✨ NEW SMOOTH INSPECTION MODAL MARKUP OVERLAY --- */}
       {activeModalLog && (
         <div style={s.overlay} onClick={() => setActiveModalLog(null)}>
           <div style={s.modal} onClick={(e) => e.stopPropagation()}>

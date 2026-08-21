@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 export default function Analytics() {
   const context = useOutletContext() || {};
   const { user, currentUser, userId: contextUserId } = context;
@@ -14,7 +16,7 @@ export default function Analytics() {
   async function fetchAnalytics() {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:5000/api/analytics?userId=${encodeURIComponent(activeUserId)}`);
+      const response = await fetch(`${API_URL}/api/analytics?userId=${encodeURIComponent(activeUserId)}`);
       const result = await response.json();
       if (result.success) {
         setMetrics(result.analytics);

@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const mainHubTools = [
   { id: "/upload", badge: "✦ START HERE", title: "Upload New Content", desc: "Drop your videos, audio links, or text articles here. Our AI will instantly break them down and get them ready for your social media platforms.", actionText: "Open Studio →", color: "#5b21b6", bg: "#e9d5ff", btnBg: "#5b21b6", btnColor: "#fff", border: "#d8b4fe" },
   { id: "/templates", badge: "⚡ PLATFORMS", title: "Choose Your Templates", desc: "Pick how you want your content to look. Easily turn one single video into perfect Twitter threads, LinkedIn posts, or Instagram captions.", actionText: "View Templates →", color: "#c2410c", bg: "#ffedd5", btnBg: "#c2410c", btnColor: "#fff", border: "#fed7aa" },
@@ -24,7 +26,7 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchDashboardStats = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/analytics?userId=${encodeURIComponent(activeUserId)}`);
+        const response = await fetch(`${API_URL}/api/analytics?userId=${encodeURIComponent(activeUserId)}`);
         const result = await response.json();
         if (result.success) {
           setLiveMetrics({
@@ -49,7 +51,7 @@ export default function Dashboard() {
     { 
       metric: "Total Posts Made", 
       value: liveMetrics.loading ? "..." : liveMetrics.totalPosts, 
-      details: "Real-time records committed to local database instance", 
+      details: "Real-time records committed to database instance", 
       changeColor: "#6b21a8",
       badgeText: "✦ Performance Tracker",
       icon: null

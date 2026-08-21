@@ -19,7 +19,6 @@ export default function Login() {
     setLoading(true);
     setErrorMessage("");
 
-    // Get the list of registered users from localStorage (or an empty list if none exist)
     const existingUsers = JSON.parse(localStorage.getItem("viraly_users") || "[]");
     
     setTimeout(() => {
@@ -32,27 +31,26 @@ export default function Login() {
           return;
         }
 
-        // Check if email already exists
-        const userExists = existingUsers.some(u => u.email.toLowerCase() === email.toLowerCase());
+        const userExists = existingUsers.some(u => u.email.toLowerCase() === email.toLowerCase().trim());
         if (userExists) {
           setErrorMessage("An account with this email already exists!");
           return;
         }
 
-        // Create new user object
         const newUser = {
           name: name.trim(),
           email: email.trim().toLowerCase(),
-          password: password // In a real app, this would be encrypted
+          password: password
         };
 
-        // Save to localStorage array
         existingUsers.push(newUser);
         localStorage.setItem("viraly_users", JSON.stringify(existingUsers));
+        localStorage.setItem("userId", newUser.email);
+        localStorage.setItem("userEmail", newUser.email);
+        localStorage.setItem("userName", newUser.name);
 
-        // Log them in instantly with their newly created name!
         setShowModal(false);
-        navigate("/dashboard", { state: { userName: newUser.name } });
+        navigate("/dashboard", { state: { userName: newUser.name, userId: newUser.email } });
 
       } else {
         // --- SIGN IN LOGIC ---
@@ -61,19 +59,20 @@ export default function Login() {
           return;
         }
 
-        // Find user by email
-        const foundUser = existingUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
+        const foundUser = existingUsers.find(u => u.email.toLowerCase() === email.toLowerCase().trim());
 
         if (foundUser && foundUser.password === password) {
-          // Success! Pass the real found name into the dashboard state
+          localStorage.setItem("userId", foundUser.email);
+          localStorage.setItem("userEmail", foundUser.email);
+          localStorage.setItem("userName", foundUser.name);
+
           setShowModal(false);
-          navigate("/dashboard", { state: { userName: foundUser.name } });
+          navigate("/dashboard", { state: { userName: foundUser.name, userId: foundUser.email } });
         } else {
-          // Failure message
           setErrorMessage("Invalid email or password!");
         }
       }
-    }, 1200);
+    }, 800);
   };
 
   const openModal = (loginMode) => {
@@ -118,9 +117,9 @@ export default function Login() {
       <nav style={s.nav}>
         <div style={s.navLogo}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: "#818cf8" }}>
-  <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z" />
-  <path d="M6 12c0-1.657 2.686-3 6-3s6 1.343 6 3-2.686 3-6 3-6-1.343-6-3z" opacity="0.5" />
-</svg>
+            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z" />
+            <path d="M6 12c0-1.657 2.686-3 6-3s6 1.343 6 3-2.686 3-6 3-6-1.343-6-3z" opacity="0.5" />
+          </svg>
           <span style={s.navBrand}>Viraly</span>
         </div>
         <div style={s.navActions}>
@@ -176,7 +175,6 @@ export default function Login() {
 
             <h2 style={s.cardTitle}>{isLogin ? "Welcome back" : "Create your account"}</h2>
 
-            {/* Error Message Box */}
             {errorMessage && (
               <div style={s.errorBox}>{errorMessage}</div>
             )}
@@ -190,7 +188,7 @@ export default function Login() {
               )}
               <div style={s.field}>
                 <label style={s.label}>Email</label>
-                <input type="type" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} style={inputStyle("email")} onFocus={() => setFocusedField("email")} onBlur={() => setFocusedField(null)} required />
+                <input type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} style={inputStyle("email")} onFocus={() => setFocusedField("email")} onBlur={() => setFocusedField(null)} required />
               </div>
               <div style={s.field}>
                 <div style={s.labelRow}>
