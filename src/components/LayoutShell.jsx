@@ -4,6 +4,7 @@ import { useLocation, useNavigate, Outlet } from "react-router-dom";
 const sidebarLinks = [
   { icon: "⊞", label: "Dashboard", id: "dashboard", path: "/dashboard" },
   { icon: "↑", label: "New Upload", id: "upload", path: "/upload" },
+  { icon: "📅", label: "Content Calendar", id: "calendar", path: "/calendar" },
   { icon: "◷", label: "History", id: "history", path: "/history" },
   { icon: "⚡", label: "Templates", id: "templates", path: "/templates" },
   { icon: "📊", label: "Analytics", id: "analytics", path: "/analytics" },

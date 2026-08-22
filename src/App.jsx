@@ -6,6 +6,7 @@ import Upload from "./pages/Upload";
 import History from "./pages/History";
 import Templates from "./pages/Templates";
 import Analytics from "./pages/Analytics";
+import Calendar from "./pages/Calendar";
 import Settings from "./pages/Settings";
 
 export default function App() {
@@ -19,6 +20,7 @@ export default function App() {
         <Route element={<LayoutShell />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/upload" element={<Upload />} />
+          <Route path="/calendar" element={<Calendar />} />
           <Route path="/history" element={<History />} />
           <Route path="/templates" element={<Templates />} />
           <Route path="/analytics" element={<Analytics />} />

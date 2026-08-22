@@ -1,5 +1,5 @@
-import { useMemo, useRef, useState } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useMemo, useRef, useState, useEffect } from 'react';
+import { useOutletContext, useLocation } from 'react-router-dom';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const inputTabs = [
@@ -20,18 +20,20 @@ function splitSections(content) {
 
 export default function Upload() {
   const context = useOutletContext() || {};
+  const location = useLocation();
+  const prefill = location.state || {};
   const { user, currentUser, userId: contextUserId } = context;
 
   // Resolve active userId from context or localStorage fallback
   const activeUserId = contextUserId || user?.uid || user?.email || currentUser?.uid || currentUser?.email || localStorage.getItem("userId") || localStorage.getItem("userEmail") || "user_default";
 
-  const [tab, setTab] = useState('youtube');
+  const [tab, setTab] = useState(prefill.initialTab || (prefill.prefilledPrompt ? 'raw' : 'youtube'));
   const [youtubeUrl, setYoutubeUrl] = useState('');
   const [documentText, setDocumentText] = useState('');
-  const [rawRequest, setRawRequest] = useState('');
+  const [rawRequest, setRawRequest] = useState(prefill.prefilledPrompt || '');
   const [document, setDocument] = useState(null);
-  const [formats, setFormats] = useState(['answer', 'reel']);
-  const [tone, setTone] = useState('Professional');
+  const [formats, setFormats] = useState(prefill.prefilledFormat ? [prefill.prefilledFormat] : ['answer', 'reel']);
+  const [tone, setTone] = useState(prefill.prefilledTone || 'Professional');
   const [youtubeContext, setYoutubeContext] = useState('');
   const [documentContext, setDocumentContext] = useState('');
   const [output, setOutput] = useState('');
@@ -40,6 +42,16 @@ export default function Upload() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
   const fileInput = useRef(null);
+
+  useEffect(() => {
+    if (prefill.prefilledPrompt) {
+      setRawRequest(prefill.prefilledPrompt);
+      setTab('raw');
+      if (prefill.prefilledFormat) {
+        setFormats([prefill.prefilledFormat]);
+      }
+    }
+  }, [prefill]);
 
   const sourceReady = tab === 'youtube' ? youtubeUrl.trim() : tab === 'document' ? Boolean(document?.content || documentText.trim()) : rawRequest.trim();
   const sourceLabel = useMemo(() => tab === 'youtube' ? 'YouTube video' : tab === 'document' ? document?.name || 'Document source' : 'Raw request', [tab, document]);
