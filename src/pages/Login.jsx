@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -13,8 +13,26 @@ export default function Login() {
   const [name, setName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loadingText, setLoadingText] = useState("Authenticating…");
   const [focusedField, setFocusedField] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
+
+  // Pre-warm the backend cloud server as soon as the visitor lands on the site
+  useEffect(() => {
+    fetch(`${API_URL}/api/health`).catch(() => {});
+  }, []);
+
+  // Update loading message if server is taking a moment to spin up
+  useEffect(() => {
+    let timer;
+    if (loading) {
+      setLoadingText("Authenticating…");
+      timer = setTimeout(() => {
+        setLoadingText("Connecting to cloud database…");
+      }, 2500);
+    }
+    return () => clearTimeout(timer);
+  }, [loading]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -82,7 +100,7 @@ export default function Login() {
         navigate("/dashboard", { state: { userName: data.user.name, userId: data.user.email } });
       }
     } catch (err) {
-      setErrorMessage(err.message.includes('Failed to fetch') ? 'Cannot reach the backend server. Please try again in a moment.' : err.message);
+      setErrorMessage(err.message.includes('Failed to fetch') ? 'Server is waking up. Please try clicking once more in a few seconds!' : err.message);
     } finally {
       setLoading(false);
     }
@@ -92,6 +110,8 @@ export default function Login() {
     setIsLogin(loginMode);
     setErrorMessage("");
     setShowModal(true);
+    // Ping health on open to ensure fast response
+    fetch(`${API_URL}/api/health`).catch(() => {});
   };
 
   const inputStyle = (field) => ({
@@ -214,7 +234,12 @@ export default function Login() {
               </div>
 
               <button type="submit" style={s.submitBtn} disabled={loading}>
-                {loading ? <span style={s.spinner} /> : isLogin ? "Launch Studio Engine →" : "Create Account & Launch →"}
+                {loading ? (
+                  <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span style={s.spinner} />
+                    <span>{loadingText}</span>
+                  </span>
+                ) : isLogin ? "Launch Studio Engine →" : "Create Account & Launch →"}
               </button>
             </form>
 
