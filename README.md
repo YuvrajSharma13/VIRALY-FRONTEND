@@ -92,4 +92,4 @@ Open your browser at `http://localhost:5173`.
 
 ## 👨‍💻 Author
 
-Built with ❤️ by **[Yuvraj Sharma](https://github.com/YuvrajSharma13)**
+Built by **Yuvraj Sharma**
